@@ -5,7 +5,7 @@ Dataset containing anonimized energy and temperature data from homes in the Asse
 * [General info](#general-info)
 * [Data pre-processing](#data-pre-processing)
 * [Date and time information](#date-and-time-information) 
-* [Data formwat](#data-format) 
+* [Data format](#data-format) 
 * [Status](#status)
 * [License](#license)
 * [Credits](#credits)
@@ -20,7 +20,6 @@ This repository will contain an anonimized dataset comprising time series measur
 A future release of this section will describe per device/system how the data was obtained and pre-processed. <br>
 Refer to the [data format section](#data-format) for a detailed description of the data format.
 
-
 ## Date and time information
 
 Date and time information is represented as an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) time stamp in the format _YYYY-MM-DDThh:mm:ss±hhmm_. For convenience the date, time and UTC offset were also added as separate columns.
@@ -31,11 +30,37 @@ All timestampes were collected with measurement devices connected to the interne
 
 In this section the data format will be described.<br>
 
-### Homes 
-
 ### Weather 
 
-### Properties 
+Weather data was collected and geospatially interpolated using the  using the [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) from the Royal Netherlands Meteorological Institute (KNMI). For all homes, we used the same location for geospatial interpolation of weather data:
+`lat, lon = 52.5065500000, 6.0996100000`.
+
+Below is a table that documents the weather properties that we retrieved from KNMI.
+
+| Repository                                                                        | Symbol | Symbol  | Property.Unit | [Value format](https://en.wikipedia.org/wiki/Printf_format_string) | Measurement interval \[h:mm:ss\] | column name interpolated data          | Description                   |
+| --------------------------------------------------------------------------------- | ------ | ------- | ------------- | ------------------------------------------------------------------ | -------------------------------- | -------------------------------------- | ----------------------------- |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | Tout   | ` T`  | °C            | %f                                                                 | 01:00:00                         | outdoor\_temp\_degC                    | outdoor temperature           |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | W      | ` FH` | m/s           | %f                                                                 | 01:00:00                         | windspeed\_m\_per\_s                   | wind speed                    |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | I      | ` Q`  | J/(h\*cm^2)   | %f                                                                 | 01:00:00                         | hor\_irradiation\_J\_per\_h\_per\_cm^2 | global horizontal irradiation |
+
+For completeness, we also included the geospatially interpolated weather, temporally interpolated to intervals of 15 minutes in the file [weather-assendorp-interpolated.csv](weather-data/weather-assendorp-interpolated.csv)
+
+
+### Homes 
+
+### Measurement Devices 
+
+We used the following measurement device types to collect data. Some devices consisted of a main device and one or two satellite devices.
+
+| DeviceType.name            | Category                                                | Main device repo                                                                                           | Sattelite device 2 repo                                                                          | Sattelite device 2 repo                                                                              |
+| -------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| OpenTherm-Monitor          | comfort + installation + occupancy                      | [twomes-opentherm-monitor-firmware](https://github.com/energietransitie/twomes-opentherm-monitor-firmware) |                                                                                                  |                                                                                                      |
+| DSMR-P1-gateway            | energy                                                  | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               |                                                                                                  |                                                                                                      |
+| DSMR-P1-gateway-Tin        | energy + comfort                                        | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) |                                                                                                      |
+| DSMR-P1-gateway-TinTsTr    | energy + comfort + installation                         | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) | [twomes-boiler-monitor-firmware](https://github.com/energietransitie/twomes-boiler-monitor-firmware) |
+| DSMR-P1-gateway-TinTsTrCO2 | energy + comfort + installation + occupancy/ventilation | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) | [twomes-boiler-monitor-firmware](https://github.com/energietransitie/twomes-boiler-monitor-firmware) |
+
+### Measured Properties 
 
 Below is a table that describes all properties that were measured by various measurement devices, including the name of the column in the [interpolated measurements](#interpolated-measurements).
 
@@ -71,8 +96,6 @@ Below is a table that describes all properties that were measured by various mea
 | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)                                    | DSMR-P1-gateway            | energy                | G       | `gMeterReadingSupply`     | m^3           | %.3f                                                               | 00:05:00                         | gas\_m^3                               | gas meter reading                          | (digital)                                                                   | 0-n:24.2.1.255 |                                                                                                                   |                                                                                                                     |
 
 
-### Devices 
-
 ### Measurements 
 
 ### Interpolated Measurements 
@@ -93,3 +116,6 @@ This dataset is a collaborative effort of:
 Thanks also go to:
 * all subjects who volunteered to make their measurement data available
 * [Stichting 50 Tinten Groen Assendorp](https://50tintengroenassendorp.nl/)
+
+We use and gratefully aknowlegde the efforts of the makers of the following source code and libraries:
+* [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather), by [@stephanpcpeters](https://github.com/stephanpcpeters), licensed under [an MIT-style licence](https://raw.githubusercontent.com/stephanpcpeters/HourlyHistoricWeather/master/historicdutchweather/LICENSE)
