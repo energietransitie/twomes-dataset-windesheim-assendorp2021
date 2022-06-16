@@ -48,6 +48,8 @@ For completeness, we also included the geospatially interpolated weather, tempor
 
 ### Homes 
 
+TODO: describe
+
 ### Measurement Devices 
 
 We used the following measurement device types to collect data. Some devices consisted of a main device and one or two satellite devices.
@@ -95,10 +97,13 @@ Below is a table that describes all properties that were measured by various mea
 | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)                                    | DSMR-P1-gateway            | energy                | G       | `gMeterReadingTimestamp`  | local time    | YYMMDDhhmX                                                         | 00:05:00                         |                                        | gas meter reading                          | (digital)                                                                   | 0-0:1.0.0.255  |                                                                                                                   |                                                                                                                     |
 | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)                                    | DSMR-P1-gateway            | energy                | G       | `gMeterReadingSupply`     | m^3           | %.3f                                                               | 00:05:00                         | gas\_m^3                               | gas meter reading                          | (digital)                                                                   | 0-n:24.2.1.255 |                                                                                                                   |                                                                                                                     |
 
-
 ### Measurements 
 
+TODO: describe
+
 ### Interpolated Measurements 
+
+TODO: describe
 
 ## Status
 Dataset is: _collected_, _anonimization-in-progress_
