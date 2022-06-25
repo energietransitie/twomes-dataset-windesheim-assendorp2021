@@ -3,34 +3,57 @@ Dataset containing anonimized energy and temperature data from homes in the Asse
 
 ## Table of contents
 * [General info](#general-info)
-* [Data pre-processing](#data-pre-processing)
-* [Date and time information](#date-and-time-information) 
-* [Data format](#data-format) 
+* [Subject Recruitment](#recruitment)
+* [Inclusion criteria](#inclusion-criteria)
+* [Data](#data) 
 * [Status](#status)
 * [License](#license)
 * [Credits](#credits)
 
 ## General info
+
 This repository will contain an anonimized dataset comprising time series measurement data about enery and temperatures in residential homes (mostly) in the Assendorp neighbourhood in Zwolle, the Netherlands, obtained during the heating season of 2021-2022 in the Twomes research project.
 
 **Note**: [Git LFS](https://git-lfs.github.com/) is required to clone big CSV files
 
-## Data pre-processing
+## Recruitment 
+
+Subjects were recruitedfrom the municipality of Zwolle during autumn 2021. Recruitment was primarily targeted at the Assendorp neighbourhood, via [50 Tinten Groen Assendorp](https://50tintengroenassendorp.nl/), e.g. via a [news message](https://50tintengroenassendorp.nl/40-13-september-2021-warmtewachters-gezocht/). In November 2021, additional subjects were recruited amongst colleagues and students of Windesheim University of Applied Sciences, e.g. via an [internal message](https://liveadminwindesheim.sharepoint.com/sites/rvd-Domein-Techniek/Lists/Announcements/DispForm.aspx?ID=181). 
+
+Subjects could volunteer to participate and give informed consent by filling out this [generic online recruitment survey](https://edu.nl/yyhpt) ([this survey is also available in XML-format](https://www.energietransitiewindesheim.nl/assendorp2021/recruitment/Survey_Twomes_Bluetooth-v10.qsf)). Subjects that satified all [inclusion criteria](#inclusion-criteria) were also asked to fill out this [online survey to provide their static Bluetooth MAC addressto us](https://edu.nl/wfnc4) ([this survey is also available in XML-format](https://energietransitiewindesheim.nl/assendorp2021/recruitment/Survey_Twomes_Bluetooth-v10.qsf)) and were asked to forward this latter survey to the other members of the household with a smartphone.   
+
+## Inclusion criteria
+
+Inclusion criteria were:
+* the home address lies in the muncipality of Zwolle, the Netherlands;
+* the home is equipped with an internet connection and wireless internet (Wi-Fi);
+* the home is heated by a gas-fired heating boiler that is controlled by a termostat and is not predominantly heated via other means;
+* a smart energy meter is installed in the home;
+* at least one of the occupants has an Android/iOS smartphone.
+
+## Data management
+
+We documented our [Data Management Plan](https://edu.nl/38wq4) online. The privacy policy (in Dutch)_ is available online as well in a layered structure: [short summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy.html), [summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-summary.html) and [full version](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-full.html). 
+
+## Data
+
+In the sections below, the data pre-processing and data formats used in the data files will be described.
+
+### Data pre-processing
 
 A future release of this section will describe per device/system how the data was obtained and pre-processed. <br>
 Refer to the [data format section](#data-format) for a detailed description of the data format.
-
-## Date and time information
+### Date and time information
 
 Date and time information is represented as an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) time stamp in the format _YYYY-MM-DDThh:mm:ss±hhmm_. For convenience the date, time and UTC offset were also added as separate columns.
 
 All timestampes were collected with measurement devices connected to the internet. Setting the local device clock to the proper UTC time via NTP was one of the first steps performed by the measurement devices after they were connected to the internet via the home Wi-Fi network of a subject. Each measurement device synchronized its device clock via NTP every 6 hours. Measurement devices timestamped measurement with Unix time according to the local device clock. Uploads of measurement data (which could contain more than one measurement) were timestamped both by the measurement device according to the local device clock and by the server. Before exporting to the csv files in this repository, all timestampes were converted to timezone-aware timestamps using the Europe/Amsterdam timezone.
 
-## Data format
+### Homes 
 
-In this section the data format will be described.<br>
+TODO: describe
 
-### Weather 
+### Weather data
 
 Weather data was collected and geospatially interpolated using [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) from the Royal Netherlands Meteorological Institute (KNMI). Below is a table that documents the weather properties that we retrieved from KNMI.
 
@@ -44,10 +67,6 @@ For all homes, we used the same location for geospatial interpolation of weather
 `lat, lon = 52.5065500000, 6.0996100000`.
 
 For completeness, we also included the geospatially interpolated weather in the file [weather-assendorp-interpolated.csv](weather-data/weather-assendorp-interpolated.csv). For our analysis, we termporally interpolated the weather data to intervals of 15 minutes.
-
-### Homes 
-
-TODO: describe
 
 ### Measurement Devices 
 
