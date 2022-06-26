@@ -1,4 +1,4 @@
-# twomes-dataset-assendorp2021
+# Dataset Assendorp 2021 - Digital Twins for the heating transition
 Dataset containing anonimized energy and temperature data from homes in the Assendorp neighbourhood in Zwolle, the Netherlands
 
 ## Table of contents
