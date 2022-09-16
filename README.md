@@ -60,16 +60,14 @@ TODO: describe
 
 Weather data was collected and geospatially interpolated using [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) from the Royal Netherlands Meteorological Institute (KNMI). Below is a table that documents the weather properties that we retrieved from KNMI.
 
-| Repository                                                                        | Symbol | Symbol  | Property.Unit | [Value format](https://en.wikipedia.org/wiki/Printf_format_string) | Measurement interval \[h:mm:ss\] | column name interpolated data          | Description                   |
-| --------------------------------------------------------------------------------- | ------ | ------- | ------------- | ------------------------------------------------------------------ | -------------------------------- | -------------------------------------- | ----------------------------- |
-| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | Tout   | ` T`  | °C            | %f                                                                 | 01:00:00                         | outdoor\_temp\_degC                    | outdoor temperature           |
-| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | W      | ` FH` | m/s           | %f                                                                 | 01:00:00                         | windspeed\_m\_per\_s                   | wind speed                    |
-| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | I      | ` Q`  | J/(h\*cm<sup>2</sup>)   | %f                                                                 | 01:00:00                         | hor\_irradiation\_J\_per\_h\_per\_cm^2 | global horizontal irradiation |
+| Repository                                                                        | Symbol  | Property.Unit | [Value format](https://en.wikipedia.org/wiki/Printf_format_string) | Measurement interval \[h:mm:ss\] | column name interpolated data          | Description                   |
+| --------------------------------------------------------------------------------- | ------- | ------------- | ------------------------------------------------------------------ | -------------------------------- | -------------------------------------- | ----------------------------- |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | ` T`  | °C            | %f                                                                 | 01:00:00                         | outdoor\_temp\_degC                    | outdoor temperature           |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | ` FH` | m/s           | %f                                                                 | 01:00:00                         | windspeed\_m\_per\_s                   | wind speed                    |
+| [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) | ` Q`  | J/(h\*cm<sup>2</sup>)   | %f                                                                 | 01:00:00                         | hor\_irradiation\_J\_per\_h\_per\_cm^2 | global horizontal irradiation |
 
 For all homes, we used the same location for geospatial interpolation of weather data using code from the [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) repository:
 [`lat, lon = 52.50655, 6.09961`](https://www.openstreetmap.org/?mlat=52.50655&mlon=6.09961#map=17/52.50655/6.09961).
-
-For completeness, we also included the geospatially interpolated weather in the file [weather-assendorp-interpolated.csv](weather-data/weather-assendorp-interpolated.csv). For our analysis, we termporally interpolated the weather data to intervals of 15 minutes.
 
 ### Measurement Devices 
 
@@ -126,8 +124,9 @@ TODO: describe
 
 | **Column index** | **Column name**            | **Description**                                   | **Unit** | **[Value format](https://en.wikipedia.org/wiki/Printf_format_string)**               | **Interval aggregation** | **Calculation**                                          |
 |------------------|----------------------------|---------------------------------------------------|----------|--------------------------|--------------------------|----------------------------------------------------------|
+| 0                | `#`                    | record number                                      |          |                          | -                        |                                                          |
 | 1                | `home_id`                    | subject code                                      |          |                          | -                        |                                                          |
-| 2                | `timestamp`                  | start date and time of interval (timezone aware)  |          | [YYYY-MM-DDThh:mm:ss±hhmm](https://en.wikipedia.org/wiki/ISO_8601) | start                    |                                                          |
+| 2                | `timestamp_ISO8601`                  | start date and time of interval (timezone aware)  |          | [YYYY-MM-DDThh:mm:ss±hhmm](https://en.wikipedia.org/wiki/ISO_8601) | start                    |                                                          |
 | 3                | `unix_time`                     | start date and time of interval represented as [Unix time](https://en.wikipedia.org/wiki/Unix_time)                                         |          | %d                       | start                    |                                                          |
 | 4                | `date_local`                 | start date of interval (local time)               |          | YYYY-MM-DD               | start                    |                                                          |
 | 5                | `time_local`                 | start time of interval (local time)               |          | hh:mm:ss                 | start                    |                                                          |
