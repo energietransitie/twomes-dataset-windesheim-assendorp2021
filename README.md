@@ -35,7 +35,7 @@ Inclusion criteria were:
 
 ## Data management
 
-We documented our [Data Management Plan](https://edu.nl/38wq4) online. The privacy policy (in Dutch)_ is available online as well in a layered structure: [short summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy.html), [summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-summary.html) and [full version](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-full.html). 
+We documented our [Data Management Plan](https://edu.nl/38wq4) online. The privacy policy (in Dutch) is available online as well in a layered structure: [short summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy.html), [summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-summary.html) and [full version](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-full.html). 
 
 ## Data
 
@@ -43,14 +43,31 @@ In the sections below, the data pre-processing and data formats used in the data
 
 ### Data pre-processing
 
-A future release of this section will describe per device/system how the data was obtained and pre-processed.<br>
-Refer to the [data format section](#data-format) for a detailed description of the data format.
+Preprocessing of measurements in the measurement database was doen using [the get_preprocessed_homes_data function in the extractor.py file of the twomes-twutility-inverse-grey-box-analysis repository](https://github.com/energietransitie/twomes-twutility-inverse-grey-box-analysis/blob/main/data/extractor.py). 
+
+Steps include:
+- data retrieval from the measurement server for selected homes, properties and date range
+- for smart meter measurement values, conversion of meter readings to energy usage;
+- absolute outlier removal: removing measurement data that is clearly a measurement error:
+  - indoor temperatures below 0 °C and above 40 °C;
+  - setpoint temperatures below 0 °C and above 45 °C;
+- statistic outlier removal: removing temperature data that are more than 3 standard deviations away from the mean of the measurements;
+- upsampling of measurements to 5 minutes;
+- interpolation of measurements to intervals of 15 minutes;
+  - we did not interpolate across valid measurements that were 60 minutes apart or more.
+  - we aggregated measurements over the interval as indicated in the table in the section [Interpolated and preprocessed data](#interpolated-and-preprocessed-data), below;
+
+We used the following converstation factors:
+* 35,17 MJ/m<sup>3</sup> [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas) to convert `gMeterReadingSupply` values to `gas_sup_avg_W` values
+* timezone [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands) to convert `unix_time` to `timestamp_ISO8601`
 
 ### Date and time information
 
-Date and time information is represented as an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) time stamp in the format _YYYY-MM-DDThh:mm:ss±hhmm_. For convenience the date, time and UTC offset were also added as separate columns.
+All timestamps were measured in [Unix time](https://en.wikipedia.org/wiki/Unix_time) format, using device clocks regularly synchronized via NTP with the correct UTC time. Timestamps of the start of measurement intervals of interpolated and pre-processed measurement data is not only represented as represented as [Unix time](https://en.wikipedia.org/wiki/Unix_time), but also as a [fully qualified ISO 8601 timestamp](https://en.wikipedia.org/wiki/ISO_8601) time stamp in the format _YYYY-MM-DDThh:mm:ss±hh:mm_, using the timezone [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands).
 
-All timestampes were collected with measurement devices connected to the internet. Setting the local device clock to the proper UTC time via NTP was one of the first steps performed by the measurement devices after they were connected to the internet via the home Wi-Fi network of a subject. Each measurement device synchronized its device clock via NTP every 6 hours. Measurement devices timestamped measurement with Unix time according to the local device clock. Uploads of measurement data (which could contain more than one measurement) were timestamped both by the measurement device according to the local device clock and by the server. Before exporting to the csv files in this repository, all timestampes were converted to timezone-aware timestamps using the Europe/Amsterdam timezone.
+For smart meter measurements, if available and sane, the time information  in the `eMeterReadingTimestamp` property or `gMeterReadingTimestamp` was used as timestamp of the measurement.
+
+Setting the local device clock to the proper UTC time via NTP was one of the first steps performed by the measurement devices after they were connected to the internet via the home Wi-Fi network of a subject. Each measurement device synchronized its device clock via NTP every 6 hours. Uploads of measurement data (which could contain more than one measurement) were timestamped both by the measurement device according to the local device clock and by the server. We did not yet check for deviations between the last device timestamp of a measurement upload and the upload timestamp at the server.
 
 ### Homes 
 
@@ -118,7 +135,15 @@ Below is a table that describes all properties that were measured by various mea
 
 ### Measurements 
 
-TODO: describe
+| **Column index** | **Column name**  | **Description**                                                                                            |
+|------------------|------------------|------------------------------------------------------------------------------------------------------------|
+| 0                | `#`              | record number                                                                                              |
+| 1                | `home_id`        | subject code                                                                                               |
+| 3                | `unix_time`      | start date and time of the measurement represented as [Unix time](https://en.wikipedia.org/wiki/Unix_time) |
+| 4                | `property_name`  | property name of the measurement                                                                           |
+| 5                | `value`          | value of the measurement                                                                                   |
+| 6                | `unit`           | unit of the measurement value                                                                              |
+| 7                | `measurement_id` | unique id of the measurement                                                                               |
 
 ### Interpolated and preprocessed data 
 
@@ -126,26 +151,22 @@ TODO: describe
 |------------------|----------------------------|---------------------------------------------------|----------|--------------------------|--------------------------|----------------------------------------------------------|
 | 0                | `#`                    | record number                                      |          |                          | -                        |                                                          |
 | 1                | `home_id`                    | subject code                                      |          |                          | -                        |                                                          |
-| 2                | `timestamp_ISO8601`                  | start date and time of interval (timezone aware)  |          | [YYYY-MM-DDThh:mm:ss±hhmm](https://en.wikipedia.org/wiki/ISO_8601) | start                    |                                                          |
+| 2                | `timestamp_ISO8601`                  | start date and time of interval (timezone aware)  |          | [YYYY-MM-DDThh:mm:ss±hh:mm](https://en.wikipedia.org/wiki/ISO_8601) | start                    |                                                          |
 | 3                | `unix_time`                     | start date and time of interval represented as [Unix time](https://en.wikipedia.org/wiki/Unix_time)                                         |          | %d                       | start                    |                                                          |
-| 4                | `date_local`                 | start date of interval (local time)               |          | YYYY-MM-DD               | start                    |                                                          |
-| 5                | `time_local`                 | start time of interval (local time)               |          | hh:mm:ss                 | start                    |                                                          |
-| 6                | `utc_offset`                 | offset of local time to UTC time                  | h        | %.2f                     | start                    |                                                          |
-| 7                | `T_out_avg_C`                | outdoor temperature                               | °C       | %.2f                     | average                  |                                                          |
-| 8                | `wind_avg_m_p_s`             | wind speed                                        | m/s      | %.2f                     | average                  |                                                          |
-| 9                | `irradiation_hor_avg_W_p_m2` | global horizontal irradiation                     | W/m<sup>2</sup>     | %d                       | average                  |                                                          |
-| 10               | `T_out_e_avg_C`              | effective outdoor temperature                     | °C       | %.2f                     | average                  | `T_out_avg_C` - 2/3 * `wind_avg_m_p_s`                       |
-| 11               | `T_in_avg_C`                 | indoor temperature                                | °C       | %.2f                     | average                  |                                                          |
-| 12               | `T_set_first_C`              | thermostat setpoint temperature                   | °C       | %.2f                     | latest valid at start    |                                                          |
-| 13               | `interval_s`                 | duration of interval                              | s        | %d                       | sum                      |                                                          |
-| 14               | `gas_sup_avg_W`              | natural gas power used (superior calorific value) | W        | %d                       | average                  |                                                          |
-| 15               | `e_used_avg_W`               | electrical power obtained from the grid           | W        | %d                       | average                  |                                                          |
-| 16               | `e_returned_avg_W`           | electrical power returned to the grid             | W        | %d                       | average                  |                                                          |
-| 17               | `e_remaining_heat_avg_W`     | net electrical power obtained from the grid       | W        | %d                       | average                  | `e_used_avg_W` - `e_returned_avg_W`                          |
-| 18               | `sanity_frac`                | sanity of interval                                | 1        | %d                       | average                  | 1 = all required columns have a valid value, 0 otherwise |
+| 4                | `T_out_avg_C`                | outdoor temperature                               | °C       | %.2f                     | average                  |                                                          |
+| 5                | `wind_avg_m_p_s`             | wind speed                                        | m/s      | %.2f                     | average                  |                                                          |
+| 6                | `irradiation_hor_avg_W_p_m2` | global horizontal irradiation                     | W/m<sup>2</sup>     | %d                       | average                  |                                                          |
+| 7               | `T_out_e_avg_C`              | effective outdoor temperature                     | °C       | %.2f                     | average                  | `T_out_avg_C` - 2/3 * `wind_avg_m_p_s`                       |
+| 8               | `T_in_avg_C`                 | indoor temperature                                | °C       | %.2f                     | average                  |                                                          |
+| 9               | `T_set_first_C`              | thermostat setpoint temperature                   | °C       | %.2f                     | latest valid at start    |                                                          |
+| 10               | `interval_s`                 | duration of interval                              | s        | %d                       | sum                      |                                                          |
+| 11               | `gas_sup_avg_W`              | natural gas power used (superior calorific value) | W        | %d                       | average                  |                                                          |
+| 12               | `e_used_avg_W`               | electrical power obtained from the grid           | W        | %d                       | average                  |                                                          |
+| 13               | `e_returned_avg_W`           | electrical power returned to the grid             | W        | %d                       | average                  |                                                          |
+| 14               | `e_remaining_heat_avg_W`     | net electrical power obtained from the grid       | W        | %d                       | average                  | `e_used_avg_W` - `e_returned_avg_W`                          |
+| 15               | `sanity_frac`                | sanity of interval                                | 1        | %d                       | average                  | 1 = all required columns have a valid value, 0 otherwise |
 
-During preprocessing of measurement data to interpolated data, we used the following converstation factor:
-* 35,17 MJ/m<sup>3</sup> [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas)
+
 
 ## Status
 Dataset is: _collected_, _anonimization-in-progress_
