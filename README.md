@@ -164,9 +164,6 @@ Below is a table that describes all properties that were measured by various mea
 | 12               | `e_used_avg_W`               | electrical power obtained from the grid           | W        | %d                       | average                  |                                                          |
 | 13               | `e_returned_avg_W`           | electrical power returned to the grid             | W        | %d                       | average                  |                                                          |
 | 14               | `e_remaining_heat_avg_W`     | net electrical power obtained from the grid       | W        | %d                       | average                  | `e_used_avg_W` - `e_returned_avg_W`                          |
-| 15               | `sanity_frac`                | sanity of interval                                | 1        | %d                       | average                  | 1 = all required columns have a valid value, 0 otherwise |
-
-
 
 ## Status
 Dataset is: _collected_, _anonimization-in-progress_
