@@ -58,7 +58,7 @@ Steps include:
   - we aggregated measurements over the interval as indicated in the table in the section [Interpolated and preprocessed data](#interpolated-and-preprocessed-data), below;
 
 We used the following converstation factors:
-* 35,17 MJ/m<sup>3</sup> [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas) to convert `gMeterReadingSupply` values to `gas_sup_avg__W` values
+* 35,17 MJ/m<sup>3</sup> [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas) to convert `gMeterReadingSupply` values to `gas_use__W` values
 * timezone [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands) to convert unix time to `timestamp`
 
 ### Date and time information
