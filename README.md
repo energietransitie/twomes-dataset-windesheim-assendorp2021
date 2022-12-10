@@ -168,30 +168,26 @@ For all homes, we used the same location for geospatial interpolation of weather
 ### Preprocessed data 
 
 Preprocessing of measurements in the measurement database was done using [get_preprocessed_homes_data()](https://github.com/energietransitie/twomes-twutility-inverse-grey-box-analysis/blob/main/data/extractor.py). Preprocessing steps include:
-- if available, `eMeterReadingTimestamp` and `gMeterReadingTimestamp` were used as timestamp value for timestamps of smart meter reading values, instead of the timestamp we obtain from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
+- if available, using timestamps based on `eMeterReadingTimestamp` or `gMeterReadingTimestamp` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
 - removal of duplicate measurements;
-- conversion of smart meter meter readings in kWh to average power values in W based on interval duration;
-- absolute outlier removal: removing measurement data that is clearly a measurement error:
-  - indoor temperatures below 0 °C and above 40 °C;
-  - setpoint temperatures below 0 °C and above 45 °C;
-- statistic outlier removal: removing temperature data that are more than 3 standard deviations away from the mean of the measurements;
+- calculation of derived properties as a combination of other properties, as indicated in the column `Calculation` in the table below;
+- removal of absolute outliers, i.e measurement values smaller than the value in the column `Min` or larger than the value in the column `Max` in the table below;
+- removal of statistic outliers, i.e. measuremnt values with an absolute [z-score](https://en.wikipedia.org/wiki/Standard_score) higer than the value indicated in the `Sigma` column in he table below;
 - interpolation of measurements to intervals of 15 minutes (no interpolation between measurements that were 60 minutes apart or more);
-- calculation of derived properties as a combination of other properties, as indicated in the column `Calculation` in the table below.
-- aggregation of measurements over the interval as indicated in the table in the section [Interpolated and preprocessed data](#interpolated-and-preprocessed-data), below;
 - All column values represent the average during the interval that starts at the timestamp indicated. 
 
-| Index/	Column | Name**       | Type        | **Unit**        | **Description**                                              | **Calculation**  |
-| ---------------- | ------------ | ----------- | --------------- | ------------------------------------------------------------ | --------------- |
-| index            | `id`         | `Int16`     |                 | unique code of the home                                      |                 |
-| index            | `timestamp`  | `Timestamp` |                 | start of the interpolated interval (timezone aware) |                 |
-| column           | `T_out__degC` | `float32`   | °C              | outdoor temperature                                          |                 |
-| column           | `wind__m_s_1` | `float32`   | m/s             | wind speed                                                   |                 |
-| column           | `ghi__W_m_2`  | `Int16`     | W/m<sup>2</sup> | global horizontal irradiance                                |                 |
-| column           | `T_in__degC`  | `float32`   | °C              | indoor temperature                                           |                 |
-| column           | `T_set__degC` | `float32`   | °C              | thermostat setpoint temperature                              |                 |
-| column           | `gas_use__W`  | `Int16`     | W               | natural gas power used (superior calorific value)            | Δ`gas_use_cum__m3` · `h_sup__J_m_3` / Δ`timestamp`  [^2] |
-| column           | `e_use__W`    | `Int16`     | W               | electrical power obtained from the grid                      | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |
-| column           | `e_ret__W`    | `Int16`     | W               | electrical power returned to the grid                        | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |
+| **Index/  Column** | **Name**       | **Type**        | **Unit**        | **Description**                                              | **Calculation**  | Min | Max | Sigma |
+| ---------------- | ------------ | ----------- | --------------- | ------------------------------------------------------------ | --------------- | --------------: | --------------: | --------------: |
+| index            | `id`         | `Int16`     |                 | unique code of the home                                      |                 | 800000 | 899999 |                 |
+| index            | `timestamp`  | `Timestamp` |                 | start of the interpolated interval (timezone aware) |                 |                 |                 |                 |
+| column           | `T_out__degC` | `float32`   | °C              | outdoor temperature                                          |                 | -28 | 40 |                 |
+| column           | `wind__m_s_1` | `float32`   | m/s             | wind speed                                                   |                 | 0 | 35 |                 |
+| column           | `ghi__W_m_2`  | `Int16`     | W/m<sup>2</sup> | global horizontal irradiance                                |                 | 0 | 1000 |                 |
+| column           | `T_in__degC`  | `float32`   | °C              | indoor temperature                                           |                 | 0 | 40 | 3 |
+| column           | `T_set__degC` | `float32`   | °C              | thermostat setpoint temperature                              |                 | 0 | 40 |                 |
+| column           | `gas_use__W`  | `Int16`     | W               | natural gas power used (superior calorific value)            | Δ`gas_use_cum__m3` · `h_sup__J_m_3` / Δ`timestamp`  [^2] | 0 | 1e5 |  |
+| column           | `e_use__W`    | `Int16`     | W               | electrical power obtained from the grid                      | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] | 0 | 2e4 |  |
+| column           | `e_ret__W`    | `Int16`     | W               | electrical power returned to the grid                        | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] | 0 | 2e4 |  |
 
 [^2]: `h_sup__J_m_3 = 35.17e6` J/m<sup>3</sup><br>Conversion factor for the [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas).
 
