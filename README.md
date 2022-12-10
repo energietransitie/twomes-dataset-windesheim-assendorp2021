@@ -41,34 +41,6 @@ We documented our [Data Management Plan](https://edu.nl/38wq4) online. The priva
 
 In the sections below, the data pre-processing and data formats used in the data files will be described.
 
-### Data pre-processing
-
-Preprocessing of measurements in the measurement database was doen using [the get_preprocessed_homes_data function in the extractor.py file of the twomes-twutility-inverse-grey-box-analysis repository](https://github.com/energietransitie/twomes-twutility-inverse-grey-box-analysis/blob/main/data/extractor.py). 
-
-Steps include:
-- data retrieval from the measurement server for selected homes, properties and date range
-- for smart meter measurement values, conversion of meter readings to energy usage;
-- absolute outlier removal: removing measurement data that is clearly a measurement error:
-  - indoor temperatures below 0 °C and above 40 °C;
-  - setpoint temperatures below 0 °C and above 45 °C;
-- statistic outlier removal: removing temperature data that are more than 3 standard deviations away from the mean of the measurements;
-- upsampling of measurements to 5 minutes;
-- interpolation of measurements to intervals of 15 minutes;
-  - we did not interpolate across valid measurements that were 60 minutes apart or more.
-  - we aggregated measurements over the interval as indicated in the table in the section [Interpolated and preprocessed data](#interpolated-and-preprocessed-data), below;
-
-We used the following converstation factors:
-* 35,17 MJ/m<sup>3</sup> [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas) to convert `gMeterReadingSupply` values to `gas_use__W` values
-* timezone [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands) to convert unix time to `timestamp`
-
-### Date and time information
-
-All timestamps were measured in [Unix time](https://en.wikipedia.org/wiki/Unix_time) format, using device clocks regularly synchronized via NTP with the correct UTC time. Timestamps of the start of measurement intervals of interpolated and pre-processed measurement data is not only represented as represented as [Unix time](https://en.wikipedia.org/wiki/Unix_time), but also as a [fully qualified ISO 8601 timestamp](https://en.wikipedia.org/wiki/ISO_8601) time stamp in the format _YYYY-MM-DDThh:mm:ss±hh:mm_, using the timezone [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands).
-
-For smart meter measurements, if available and sane, the time information  in the `eMeterReadingTimestamp` or `gMeterReadingTimestamp` database property was used as timestamp of the measurement.
-
-Setting the local device clock to the proper UTC time via NTP was one of the first steps performed by the measurement devices after they were connected to the internet via the home Wi-Fi network of a subject. Each measurement device synchronized its device clock via NTP every 6 hours. Uploads of measurement data (which could contain more than one measurement) were timestamped both by the measurement device according to the local device clock and by the server. We did not yet check for deviations between the last device timestamp of a measurement upload and the upload timestamp at the server.
-
 ### Homes 
 
 TODO: describe
@@ -84,6 +56,12 @@ We used the following measurement device types to collect data. Some devices con
 | `DSMR-P1-gateway-Tin`        | energy + comfort                                        | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) |                                                                                                      |
 | `DSMR-P1-gateway-TinTsTr`    | energy + comfort + installation                         | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) | [twomes-boiler-monitor-firmware](https://github.com/energietransitie/twomes-boiler-monitor-firmware) |
 | `DSMR-P1-gateway-TinTsTrCO2` | energy + comfort + installation + occupancy/ventilation | [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware)               | [twomes-room-monitor-firmware](https://github.com/energietransitie/twomes-room-monitor-firmware) | [twomes-boiler-monitor-firmware](https://github.com/energietransitie/twomes-boiler-monitor-firmware) |
+
+### Date and time information
+
+All timestamps were measured in [Unix time](https://en.wikipedia.org/wiki/Unix_time) format, using device clocks regularly synchronized via NTP with the correct UTC time. Setting the local device clock to the proper UTC time via NTP was one of the first steps performed by the measurement devices after they were connected to the internet via the home Wi-Fi network of a subject. Each measurement device synchronized its device clock via NTP every 6 hours. Uploads of measurement data (which could contain more than one measurement) were timestamped both by the measurement device according to the local device clock and by the server. We did not yet check for deviations between the last device timestamp of a measurement upload and the upload timestamp at the server.
+
+Timestamps were converted to a timezone-aware `pandas.Timestamp` value, in the [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands) timezone. In the csv files we use [ISO 8601 format with time offset](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss±hhmm`.
 
 ### Raw measurements 
  Raw masurements will be available in the folder [/raw-measurements/](/raw-measurements/). be avaiable in three formats:
@@ -105,7 +83,7 @@ TODO: insert pandas.read_csv() code here
 | index       | `id`            | `category`   | unique code of the home                                                                                                                               |
 | index       | `device_name`   | `category`   | unique name of the measurement device                                                                                                                 |
 | index       | `source`        | `category`   | [device type name](###measurement-devices) of the measurement device                                                                                  |
-| index        | `timestamp`     | `Timestamp` | start date and time of the measurement interval; in the csv file we use [ISO 8601 format with time offset](https://en.wikipedia.org/wiki/ISO_8601):  `YYYY-MM-DDThh:mm:ss±hhmm` |
+| index        | `timestamp`     | `Timestamp` | start of the interval (timezone aware) |
 | index       | `property`      | `category`   | property name of the measurement                                                                                                                      |
 | column      | `value`         | `object`     | value of the measurement                                                                                                                              |
 | column      | `unit`          | `category`   | unit of the measurement value                                                                                                                         |
@@ -129,7 +107,7 @@ TODO: insert pandas.read_csv() code here
 | ---------- | --------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | index       | `id`            | `category`   | unique code of the home                                                                                                                               |
 | index       | `source`        | `category`   | [device type name](###measurement-devices) of the measurement device                                                                                  |
-| index        | `timestamp`     | `Timestamp` | start date and time of the measurement interval; in the csv file we use [ISO 8601 format with time offset](https://en.wikipedia.org/wiki/ISO_8601):  `YYYY-MM-DDThh:mm:ss±hhmm` |
+| index        | `timestamp`     | `Timestamp` | start of the interval (timezone aware) |
 | column       | property_1; see property table below      | data_type_1   | measured value of this property |
 | column       | property2 | data_type_2   | measured value of this property |
 | ...       | ...      | ...   | ... |
@@ -171,43 +149,53 @@ Below is a table that lists all properties that were measured, the data type in 
 | `g_timestamp__YYMMDDhhmX` | `str`     | local time; tz=`Europe/Amsterdam`                                                                                                                                                                                                                                                 | 0:05:00 / 1:00:00 [^1]                         | gas meter reading                          | `DSMR-P1-gateway`            | 0-0:1.0.0.255                                                                                                                                                   | `gMeterReadingTimestamp`   | YYMMDDhhmX                                                            |
 | `g_use_cum__m3`           | `float64` | m<sup>3</sup>                                                                                                                                                                                                                                              | 0:05:00                          | gas meter reading                          | `DSMR-P1-gateway`            | 0-n:24.2.1.255                                                                                                                                                  | `gMeterReadingSupply`      | %.3f                                                                  |
 
-[^1]: Smart meters with DSMR ≥ 5.0 report meter readings every 0:05:00, smart meters with DSMR \< 5.0 report gas meter readings only every 1:00:00. 
+[^1]: Smart meters with DSMR ≥ 5.0 report meter readings every 5 minutes, smart meters with DSMR \< 5.0 report gas meter readings only every hour. 
 ### Weather measurements
 
-Weather data was collected and geospatially interpolated using [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) from the Royal Netherlands Meteorological Institute (KNMI), which represent the average value for the hour starting at the timestamp indicated. For all homes, we used the same location for geospatial interpolation of weather data:
+Weather data was collected and geospatially interpolated using [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather) from the Royal Netherlands Meteorological Institute ([KNMI](https://www.knmi.nl/over-het-knmi/about)), based on average hourly values. 
+
+For all homes, we used the same location for geospatial interpolation of weather data:
 [`lat, lon = 52.50655, 6.09961`](https://www.openstreetmap.org/?mlat=52.50655&mlon=6.09961#map=17/52.50655/6.09961), the center of the Assendorp neighbourhood in Zwolle, the Netherlands. Average values were converted from the source units to the units as indicated in the table below. 
 
 
-| Index/Column | Property        | Type        | Unit            | Measurement interval \[h:mm:ss\] | Description                                                  | Source | [Source property]([Uurwaarden van weerstations (knmi.nl)](https://www.daggegevens.knmi.nl/klimatologie/uurgegevens)) | [Source value format](https://en.wikipedia.org/wiki/Printf_format_string) | Source unit                                            |
+| Index/Column | Property        | Type        | Unit            | Measurement interval \[h:mm:ss\] | Description                                                  | Source | [Source property](https://www.daggegevens.knmi.nl/klimatologie/uurgegevens) | [Source value format](https://en.wikipedia.org/wiki/Printf_format_string) | Source unit                                            |
 | ------------ | --------------- | ----------- | --------------- | -------------------------------- | ------------------------------------------------------------ | ------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
-| index        | `timestamp`     | `Timestamp` |                 |                                  | start date and time of the measurement interval; in the csv file we use [ISO 8601 format with time offset](https://en.wikipedia.org/wiki/ISO_8601):  `YYYY-MM-DDThh:mm:ss±hhmm` | KNMI   | `YYYMMDD`, `H`                                               |                                                              | YYMMDD, H=1: 0:00:00 - 0:59:59; H=24: 23:00:00 - 23:59:59; |
+| index        | `timestamp`     | `Timestamp` |                 |                                  | start of the measurement interval | KNMI   | `YYYMMDD`, `H`                                               |                                                              | H=1: 0:00:00 - 0:59:59; H=24: 23:00:00 - 23:59:59; |
 | column       | `temp_out__degC` | `float32`   | °C              | 1:00:00                          | outdoor temperature                                          | KNMI   | ` T`                                                         | %d                                                           | 0.1&nbsp;°C                                            |
 | column       | `wind__m_s_1`    | `float32`   | m/s             | 1:00:00                          | wind speed                                                   | KNMI   | ` FH`                                                        | %d                                                           | 0.1&nbsp;m/s                                           |
-| column       | `ghi__W_m_2`     | `float32`   | W/m<sup>2</sup> | 1:00:00                          | global horizontal irradiance                                 | KNMI   | ` Q`                                                         | %d                                                           | J/cm<sup>2</sup>                                       |
+| column       | `ghi__W_m_2`     | `float32`   | W/m<sup>2</sup> | 1:00:00                          | global horizontal irradiance                                 | KNMI   | ` Q`                                                         | %d                                                           | J/(h·cm<sup>2</sup>)                                       |
 
 ### Preprocessed data 
 
-Data preprocessing consisted of the following steps:
-
-- If available, `eMeterReadingTimestamp`  and `gMeterReadingTimestamp` were used as timestamp value for timestamps of meter reading values
-- Duplicate measurements were removed.
-- Outliers were removed (*TODO: describe details*). 
-- Data was interpolated to 15 minute intervals. However, measurements were not interpolated when adjacent measurements were 60 minutes apart or more. 
-- Some properties are the result of a combination of other measured properties, as indicated in the table below.  (*TODO: describe details*)
+Preprocessing of measurements in the measurement database was done using [get_preprocessed_homes_data()](https://github.com/energietransitie/twomes-twutility-inverse-grey-box-analysis/blob/main/data/extractor.py). Preprocessing steps include:
+- if available, `eMeterReadingTimestamp` and `gMeterReadingTimestamp` were used as timestamp value for timestamps of smart meter reading values, instead of the timestamp we obtain from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
+- removal of duplicate measurements;
+- conversion of smart meter meter readings in kWh to average power values in W based on interval duration;
+- absolute outlier removal: removing measurement data that is clearly a measurement error:
+  - indoor temperatures below 0 °C and above 40 °C;
+  - setpoint temperatures below 0 °C and above 45 °C;
+- statistic outlier removal: removing temperature data that are more than 3 standard deviations away from the mean of the measurements;
+- interpolation of measurements to intervals of 15 minutes (no interpolation between measurements that were 60 minutes apart or more);
+- calculation of derived properties as a combination of other properties, as indicated in the column `Calculation` in the table below.
+- aggregation of measurements over the interval as indicated in the table in the section [Interpolated and preprocessed data](#interpolated-and-preprocessed-data), below;
 - All column values represent the average during the interval that starts at the timestamp indicated. 
 
-| Index/	Column | Name**       | Type        | **Unit**        | **Description**                                              | **Derived as**  |
+| Index/	Column | Name**       | Type        | **Unit**        | **Description**                                              | **Calculation**  |
 | ---------------- | ------------ | ----------- | --------------- | ------------------------------------------------------------ | --------------- |
 | index            | `id`         | `Int16`     |                 | unique code of the home                                      |                 |
-| index            | `timestamp`  | `Timestamp` |                 | start date and time of the interpolated interval (timezone aware) |                 |
+| index            | `timestamp`  | `Timestamp` |                 | start of the interpolated interval (timezone aware) |                 |
 | column           | `T_out__degC` | `float32`   | °C              | outdoor temperature                                          |                 |
 | column           | `wind__m_s_1` | `float32`   | m/s             | wind speed                                                   |                 |
 | column           | `ghi__W_m_2`  | `Int16`     | W/m<sup>2</sup> | global horizontal irradiance                                |                 |
 | column           | `T_in__degC`  | `float32`   | °C              | indoor temperature                                           |                 |
 | column           | `T_set__degC` | `float32`   | °C              | thermostat setpoint temperature                              |                 |
-| column           | `gas_use__W`  | `Int16`     | W               | natural gas power used (superior calorific value)            | TO DO: describe |
-| column           | `e_use__W`    | `Int16`     | W               | electrical power obtained from the grid                      | TO DO: describe |
-| column           | `e_ret__W`    | `Int16`     | W               | electrical power returned to the grid                        | TO DO: describe |
+| column           | `gas_use__W`  | `Int16`     | W               | natural gas power used (superior calorific value)            | Δ`gas_use_cum__m3` · `h_sup__J_m_3` / Δ`timestamp`  [^2] |
+| column           | `e_use__W`    | `Int16`     | W               | electrical power obtained from the grid                      | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |
+| column           | `e_ret__W`    | `Int16`     | W               | electrical power returned to the grid                        | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |
+
+[^2]: `h_sup__J_m_3 = 35.17e6` J/m<sup>3</sup><br>Conversion factor for the [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas).
+
+[^3]: `J_kWh_1 = 3.6e6` J/kWh<br>Conversion factor from kWh to J.
 
 ## Status
 Dataset is: _collected_, _anonimization-in-progress_
