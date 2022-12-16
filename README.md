@@ -180,11 +180,11 @@ Preprocessing of measurements in the measurement database was done using [get_pr
 | ---------------- | ------------ | ----------- | --------------- | ------------------------------------------------------------ | --------------- | --------------: | --------------: | --------------: |
 | index            | `id`         | `Int16`     |                 | unique code of the home                                      |                 | 800000 | 899999 |                 |
 | index            | `timestamp`  | `Timestamp` |                 | start of the interpolated interval (timezone aware) |                 |                 |                 |                 |
-| column           | `T_out__degC` | `float32`   | °C              | outdoor temperature                                          |                 | -28 | 40 |                 |
+| column           | `temp_out__degC` | `float32`   | °C              | outdoor temperature                                          |                 | -28 | 40 |                 |
 | column           | `wind__m_s_1` | `float32`   | m/s             | wind speed                                                   |                 | 0 | 35 |                 |
 | column           | `ghi__W_m_2`  | `Int16`     | W/m<sup>2</sup> | global horizontal irradiance                                |                 | 0 | 1000 |                 |
-| column           | `T_in__degC`  | `float32`   | °C              | indoor temperature                                           |                 | 0 | 40 | 3 |
-| column           | `T_set__degC` | `float32`   | °C              | thermostat setpoint temperature                              |                 | 0 | 40 |                 |
+| column           | `temp_in__degC`  | `float32`   | °C              | indoor temperature                                           |                 | 0 | 40 | 3 |
+| column           | `temp_set__degC` | `float32`   | °C              | thermostat setpoint temperature                              |                 | 0 | 40 |                 |
 | column           | `gas_use__W`  | `Int16`     | W               | natural gas power used (superior calorific value)            | Δ`gas_use_cum__m3` · `h_sup__J_m_3` / Δ`timestamp`  [^2] | 0 | 1e5 |  |
 | column           | `e_use__W`    | `Int16`     | W               | electrical power obtained from the grid                      | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] | 0 | 2e4 |  |
 | column           | `e_ret__W`    | `Int16`     | W               | electrical power returned to the grid                        | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] | 0 | 2e4 |  |
