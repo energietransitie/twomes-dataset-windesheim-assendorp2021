@@ -1,5 +1,8 @@
-# Dataset Assendorp 2021 - Digital Twins for the heating transition
+# Twomes Dataset Assendorp 2021 (metadata only; real data follows)
+
 Dataset containing anonimized energy and temperature data from homes in the Assendorp neighbourhood in Zwolle, the Netherlands
+
+*The dataset is currently in review to ensure it meet our standards for anonimization. Here, you can already view the metadata, so you know what you may expect.*
 
 ## Table of contents
 * [General info](#general-info)
@@ -13,8 +16,6 @@ Dataset containing anonimized energy and temperature data from homes in the Asse
 ## General info
 
 This repository will contain an anonimized dataset comprising time series measurement data about enery and temperatures in residential homes (mostly) in the Assendorp neighbourhood in Zwolle, the Netherlands, obtained during the heating season of 2021-2022 in the Twomes research project.
-
-*The dataset is currently in review to ensure it meet our standards for anonimization.*
 
 **Note**: [Git LFS](https://git-lfs.github.com/) is required to clone big CSV files
 
