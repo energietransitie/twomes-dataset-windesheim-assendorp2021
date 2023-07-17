@@ -23,7 +23,7 @@ This repository will contain an anonimized dataset comprising time series measur
 
 Subjects were recruitedfrom the municipality of Zwolle during autumn 2021. Recruitment was primarily targeted at the Assendorp neighbourhood, via [50 Tinten Groen Assendorp](https://50tintengroenassendorp.nl/), e.g. via a [news message](https://50tintengroenassendorp.nl/40-13-september-2021-warmtewachters-gezocht/). In November 2021, additional subjects were recruited amongst colleagues and students of Windesheim University of Applied Sciences, e.g. via an [internal message](https://liveadminwindesheim.sharepoint.com/sites/rvd-Domein-Techniek/Lists/Announcements/DispForm.aspx?ID=181). 
 
-Subjects could volunteer to participate and give informed consent by filling out this [generic online recruitment survey](https://edu.nl/yyhpt) ([this survey is also available in XML-format](https://www.energietransitiewindesheim.nl/assendorp2021/recruitment/Survey_Twomes_Bluetooth-v10.qsf)). Subjects that satified all [inclusion criteria](#inclusion-criteria) were also asked to fill out this [online survey to provide their static Bluetooth MAC addressto us](https://edu.nl/wfnc4) ([this survey is also available in XML-format](https://energietransitiewindesheim.nl/assendorp2021/recruitment/Survey_Twomes_Bluetooth-v10.qsf)) and were asked to forward this latter survey to the other members of the household with a smartphone.   
+Subjects could volunteer to participate and give informed consent by filling out this [generic online recruitment survey](data_management/recruitment/QualtricsSurvey_Twomes_v10.pdf) ([this survey is also available in XML-format](data_management/recruitment/QualtricsSurvey_Twomes_v10.qsf)). Subjects that satified all [inclusion criteria](#inclusion-criteria) were also asked to fill out this [online survey to provide their static Bluetooth MAC addressto us](data_management/recruitment\Survey_Twomes_Bluetooth-v10.pdf) ([this survey is also available in XML-format](data_management/recruitment/Survey_Twomes_Bluetooth-v10.qsf)) and were asked to forward this latter survey to the other members of the household with a smartphone.   
 
 ## Inclusion criteria
 
@@ -36,7 +36,7 @@ Inclusion criteria were:
 
 ## Data management
 
-We documented our [Data Management Plan](https://edu.nl/38wq4) online. The privacy policy (in Dutch) is available online as well in a layered structure: [short summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy.html), [summary](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-summary.html) and [full version](https://www.energietransitiewindesheim.nl/assendorp2021/privacy-full.html). 
+We documented our [Data Management Plan](data_management/DMP_online_Twomes_data_collection_Zwolle_winter_2021-2022.pdf) online. The privacy policy (in Dutch) is available online as well in a layered structure: [short summary](data_management/privacy/privacy.html), [summary](data_management/privacy/privacy-summary.html) and [full version](data_management/privacy/privacy-full.html). 
 
 ## Data
 
