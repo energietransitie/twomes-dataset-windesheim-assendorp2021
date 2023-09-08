@@ -30,7 +30,7 @@ Subjects could volunteer to participate and give informed consent by filling out
 Inclusion criteria were:
 * the home address lies in the muncipality of Zwolle, the Netherlands;
 * the home is equipped with an internet connection and wireless internet (Wi-Fi);
-* the home is heated by a gas-fired heating boiler that is controlled by a termostat and is not predominantly heated via other means;
+* the home is heated by a gas-fired heating boiler that is controlled by a thermostat and is not predominantly heated via other means;
 * a smart energy meter is installed in the home;
 * at least one of the occupants has an Android/iOS smartphone.
 
@@ -65,7 +65,7 @@ All timestamps were measured in [Unix time](https://en.wikipedia.org/wiki/Unix_t
 Timestamps were converted to a timezone-aware `pandas.Timestamp` value, in the [Europe/Amsterdam](https://en.wikipedia.org/wiki/Time_in_the_Netherlands) timezone. In the csv files we use [ISO 8601 format with time offset](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss±hhmm`.
 
 ### Raw measurements 
- Raw masurements will be available in the folder [/raw-measurements/](/raw-measurements/). be avaiable in three formats:
+ Raw masurements will be available in the folder [/raw-measurements/](/raw-measurements/) in three formats:
 
  - [twomes_raw_measurements.parquet](/raw-measurements/twomes_raw_measurements.parquet): a single [parquet](https://parquet.apache.org/) file with all 23 homes for which we have more than 3 weeks data;
  - 8nnnnn_raw_measurements.parquet: 23 [parquet](https://parquet.apache.org/) files, one for each home;
@@ -73,7 +73,7 @@ Timestamps were converted to a timezone-aware `pandas.Timestamp` value, in the [
 
 All measurement data is structured according to the table below. By importing the parquet variant using [pandas.read_parquet()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_parquet.html), you automatically get a DataFrame wih the recommended indices and data types. 
 
-Alternatively, you can also read the zipped csv files, but this typically takes much longer. You can use the code below to endup with a DataFrame with the recommended indices and data types:
+Alternatively, you can also read the zipped csv files, but this typically takes much longer. You can use the code below to end up with a DataFrame with the recommended indices and data types:
 
 ```
 TODO: insert pandas.read_csv() code here
