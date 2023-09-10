@@ -168,14 +168,18 @@ For all homes, we used the same location for geospatial interpolation of weather
 
 ### Preprocessed data 
 
-Preprocessing of measurements in the measurement database was done using [get_preprocessed_homes_data()](https://github.com/energietransitie/twomes-twutility-inverse-grey-box-analysis/blob/main/data/extractor.py). Preprocessing steps include:
-- if available, using timestamps based on `eMeterReadingTimestamp` or `gMeterReadingTimestamp` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
-- removal of duplicate measurements;
-- calculation of derived properties as a combination of other properties, as indicated in the column `Calculation` in the table below;
-- removal of absolute outliers, i.e measurement values smaller than the value in the column `Min` or larger than the value in the column `Max` in the table below;
-- removal of statistic outliers, i.e. measuremnt values with an absolute [z-score](https://en.wikipedia.org/wiki/Standard_score) higer than the value indicated in the `Sigma` column in he table below;
-- interpolation of measurements to intervals of 15 minutes (no interpolation between measurements that were 60 minutes apart or more);
-- All column values represent the average during the interval that starts at the timestamp indicated. 
+Preprocessing steps include:
+- if available, use timestamps based on `eMeterReadingTimestamp` or `gMeterReadingTimestamp` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
+- remove duplicate measurements (including duplicates that arise from the previuos step);
+- filter out smart meter resets: for each property with `_cum`  in the name, for earh time series of a particular home for that property, typically by taking a `diff()` of series, followed by setting any negative  values to zero, then taking the `cumsum()` of the series;
+- calculate energy flow rates for meter readings: for each property  with `_cum`  in the name, for earh time series of a particular home for that property, take a `diff()` of the series and assign it to a series with the same name, but without `_cum` in the name;
+- remove absolute outliers, i.e measurement values smaller than the value in the column `Min` or larger than the value in the column `Max` in the table below;
+- remove statistic outliers, i.e. measurement values with an absolute [z-score](https://en.wikipedia.org/wiki/Standard_score) higer than the value indicated in the `Sigma` column in he table below;
+- interpolate measurements to intervals of 15 minutes, but to not interpolate between measurements that are 60 minutes apart or more;
+- calculate derived properties as a combination of other properties, as indicated in the column `Calculation` in the table below.
+
+
+All column values in a preprocessed data frame represent the average during the interval that starts at the timestamp indicated. 
 
 | **Index/  Column** | **Name**       | **Type**        | **Unit**        | **Description**                                              | **Calculation**  | Min | Max | Sigma |
 | ---------------- | ------------ | ----------- | --------------- | ------------------------------------------------------------ | --------------- | --------------: | --------------: | --------------: |
