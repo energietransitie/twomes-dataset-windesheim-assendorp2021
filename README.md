@@ -169,7 +169,7 @@ For all homes, we used the same location for geospatial interpolation of weather
 ### Preprocessed data 
 
 Preprocessing steps include:
-- if available, use timestamps based on `eMeterReadingTimestamp` or `gMeterReadingTimestamp` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
+- if available, use timestamps based on `e_timestamp__YYMMDDhhmX` or `g_timestamp__YYMMDDhhmX` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
 - remove duplicate measurements (including duplicates that arise from the previuos step);
 - filter out smart meter resets: for each property with `_cum`  in the name, for earh time series of a particular home for that property, typically by taking a `diff()` of series, followed by setting any negative  values to zero, then taking the `cumsum()` of the series;
 - calculate energy flow rates for meter readings: for each property  with `_cum`  in the name, for earh time series of a particular home for that property, take a `diff()` of the series and assign it to a series with the same name, but without `_cum` in the name;
