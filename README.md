@@ -146,8 +146,8 @@ Below is a table that lists all properties that were measured, the data type in 
 | `e_use_hi_cum__kWh`       | `float64` | kWh                               | 0:05:00                          | electricity meter reading                  | `DSMR-P1-gateway`            | 1-0:1.8.2                                                                                                                                                       | `eMeterReadingSupplyHigh`  | %.3f                                                                  |
 | `e_ret_lo_cum__kWh`       | `float64` | kWh                               | 0:05:00                          | electricity meter reading                  | `DSMR-P1-gateway`            | 1-0:2.8.1                                                                                                                                                       | `eMeterReadingReturnLow`   | %.3f                                                                  |
 | `e_ret_hi_cum__kWh`       | `float64` | kWh                               | 0:05:00                          | electricity meter reading                  | `DSMR-P1-gateway`            | 1-0:2.8.2                                                                                                                                                       | `eMeterReadingReturnHigh`  | %.3f                                                                  |
-| `e_timestamp__YYMMDDhhmX` | `str`     | local time; tz=`Europe/Amsterdam` | 0:05:00                          | electricity meter reading                  | `DSMR-P1-gateway`            | 0-0:1.0.0.255                                                                                                                                                   | `eMeterReadingTimestamp`   | YYMMDDhhmX                                                            |                                  |                                            |                              |                                                                                                                                                                 |                            |                                                                       |
-| `g_timestamp__YYMMDDhhmX` | `str`     | local time; tz=`Europe/Amsterdam` | 0:05:00 / 1:00:00 [^1]           | gas meter reading                          | `DSMR-P1-gateway`            | 0-0:1.0.0.255                                                                                                                                                   | `gMeterReadingTimestamp`   | YYMMDDhhmX                                                            |
+| `e_timestamp__YYMMDDhhmmssX` | `str`     | local time; tz=`Europe/Amsterdam` | 0:05:00                          | electricity meter reading                  | `DSMR-P1-gateway`            | 0-0:1.0.0.255                                                                                                                                                   | `eMeterReadingTimestamp`   | YYMMDDhhmmssX                                                            |                                  |                                            |                              |                                                                                                                                                                 |                            |                                                                       |
+| `g_timestamp__YYMMDDhhmmssX` | `str`     | local time; tz=`Europe/Amsterdam` | 0:05:00 / 1:00:00 [^1]           | gas meter reading                          | `DSMR-P1-gateway`            | 0-0:1.0.0.255                                                                                                                                                   | `gMeterReadingTimestamp`   | YYMMDDhhmmssX                                                            |
 | `g_use_cum__m3`           | `float64` | m<sup>3</sup>                     | 0:05:00                          | gas meter reading                          | `DSMR-P1-gateway`            | 0-n:24.2.1.255                                                                                                                                                  | `gMeterReadingSupply`      | %.3f                                                                  |
 
 [^1]: Smart meters with DSMR ≥ 5.0 report meter readings every 5 minutes, smart meters with DSMR \< 5.0 report gas meter readings only every hour. 
@@ -169,7 +169,7 @@ For all homes, we used the same location for geospatial interpolation of weather
 ### Preprocessed data 
 
 Preprocessing steps include:
-- if available, use timestamps based on `e_timestamp__YYMMDDhhmX` or `g_timestamp__YYMMDDhhmX` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
+- if available, use timestamps based on `e_timestamp__YYMMDDhhmmssX` or `g_timestamp__YYMMDDhhmmssX` for smart meter reading measurements, instead of the timestamp obtained from the [twomes-p1-gateway-firmware](https://github.com/energietransitie/twomes-p1-gateway-firmware);
 - remove duplicate measurements (including duplicates that arise from the previous step);
 - filter out smart meter resets: for each property with `_cum`  in the name, for each time series of a particular home for that property, typically by taking a `diff()` of series, followed by setting any negative  values to zero, then taking the `cumsum()` of the series;
 - calculate energy flow rates for meter readings: for each property  with `_cum`  in the name, for each time series of a particular home for that property, take a `diff()` of the series and assign it to a series with the same name, but without `_cum` in the name;
@@ -190,13 +190,15 @@ All column values in a preprocessed data frame represent the average during the 
 | column             | `ghi__W_m_2`     | `Int16`     | W/m<sup>2</sup> | global horizontal irradiance                        |                                                                            |      0 |   1000 |       |
 | column             | `temp_in__degC`  | `float32`   | °C              | indoor temperature                                  |                                                                            |      0 |     40 |     3 |
 | column             | `temp_set__degC` | `float32`   | °C              | thermostat setpoint temperature                     |                                                                            |      0 |     40 |       |
-| column             | `g_use__W`       | `Int16`     | W               | natural gas power used (superior calorific value)   | Δ`g_use_cum__m3` · `h_sup__J_m_3` / Δ`timestamp`  [^2]                     |      0 |    1e5 |       |
-| column             | `e_use__W`       | `Int16`     | W               | electrical power obtained from the grid             | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |      0 |    2e4 |       |
-| column             | `e_ret__W`       | `Int16`     | W               | electrical power returned to the grid               | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp` [^3] |      0 |    2e4 |       |
+| column             | `g_use__W`       | `Int16`     | W               | natural gas power used (superior calorific value)   | Δ`g_use_cum__m3` · `h_sup__J_m_3` [^2] / Δ`timestamp__s`  [^2][^3][^4]                     |      0 |    1e5 |       |
+| column             | `e_use__W`       | `Int16`     | W               | electrical power obtained from the grid             | (Δ`e_use_hi_cum__m3`+ Δ`e_use_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp__s` [^3][^4] |      0 |    2e4 |       |
+| column             | `e_ret__W`       | `Int16`     | W               | electrical power returned to the grid               | (Δ`e_ret_hi_cum__m3`+ Δ`e_ret_lo_cum__m3`) · `J_kWh_1` / Δ`timestamp__s` [^3][^4] |      0 |    2e4 |       |
 
 [^2]: `h_sup__J_m_3 = 35.17e6` J/m<sup>3</sup><br>Conversion factor for the [superior calorific value of natural gas from the Groningen field](https://en.wikipedia.org/wiki/Groningen_gas_field#Properties_Groningen_gas).
 
 [^3]: `J_kWh_1 = 3.6e6` J/kWh<br>Conversion factor from kWh to J.
+
+[^4]: Δ`timestamp__s` make sure you divide by the interval duration, measured in seconds.
 
 ## Status
 Dataset is: _collected_, _anonymization-in-progress_
@@ -208,8 +210,9 @@ This data is made available under the [CC BY 4.0](./LICENSE.md) by the [Research
 * Henri ter Hofte · [@henriterhofte](https://github.com/henriterhofte) · Twitter [@HeNRGi](https://twitter.com/HeNRGi)
 * [Stichting 50 Tinten Groen Assendorp](https://50tintengroenassendorp.nl/)
 
-Thanks go to those who are the ultimate source of this dataset:
-* all anonymous subjects who volunteered to make their measurement data available
+Thanks go to:
+* all anonymous subjects who volunteered to make their measurement data available;
+* [@Jeffrey-H](https://github.com/Jeffrey-H) for fixing typos.
 
 We use and gratefully acknowledge the efforts of the makers of the following source code and libraries:
 * [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather), by [@stephanpcpeters](https://github.com/stephanpcpeters), licensed under [an MIT-style licence](https://raw.githubusercontent.com/stephanpcpeters/HourlyHistoricWeather/master/historicdutchweather/LICENSE)
